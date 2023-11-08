@@ -5,7 +5,6 @@ import { AiOutlineMenuUnfold } from 'react-icons/ai';
 import { projectApi } from '../../api';
 import DatePickerInput from '../../components/DatePickerInput';
 import RadioButton from '../../components/common/RadioButton';
-import KeywordInput from '../../components/common/keywordInput';
 import DashboardMenu from '../../components/userPanel/DashboardMenu';
 import ScrollToTop from '../../utils/RouteChange';
 
@@ -459,7 +458,7 @@ const AddProject = () => {
                             </div>
                             <div className="two_columns">
                                 {/* <!-- Single Input --> */}
-                                {/* <div className="form_control">
+                                <div className="form_control">
                                     <label htmlFor="project_keywords">
                                         Provide up to (5) keywords engineers can use to find your
                                         project.<span>*</span>
@@ -472,16 +471,16 @@ const AddProject = () => {
                                         placeholder="keywords"
                                     />
                                     {errorMsg.project_keywords && <div className='error-msg'>{errorMsg.project_keywords}</div>}
-                                </div> */}
+                                </div>
                                 {/* <!-- Single Input --> */}
-                                <div className="form_control">
+                                {/* <div className="form_control">
                                     <label htmlFor="project_keywords">
                                         Provide up to (5) keywords engineers can use to find your
                                         project.<span>*</span>
                                     </label>
                                     <KeywordInput />
                                     {errorMsg.project_keywords && <div className='error-msg'>{errorMsg.project_keywords}</div>}
-                                </div>
+                                </div> */}
 
 
 
