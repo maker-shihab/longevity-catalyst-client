@@ -20,7 +20,6 @@ const Dashboard = () => {
             <div className="container">
                 <div className="dashboard">
                     <DashboardMenu isActiveMenu={isActiveMenu} />
-                    <button onClick={() => refresh()}>Refresh</button>
 
                     <div className="dashboard_add_project">
                         {/* <!-- Add Project head --> */}

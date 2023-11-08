@@ -182,7 +182,7 @@ const Login = () => {
                                     name="username"
                                     id="username"
                                     placeholder="Username"
-
+                                    autoComplete="off"
                                 />
                                 {errorMsg.username && <div className='error-msg'>{errorMsg.username}</div>}
                             </div>
@@ -194,7 +194,7 @@ const Login = () => {
                                     name="password"
                                     id="password"
                                     placeholder="Type Your password"
-
+                                    autoComplete="off"
                                 />
                                 {errorMsg.password && <div className='error-msg'>{errorMsg.password}</div>}
                             </div>

@@ -1,26 +1,29 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
+import { toast } from 'react-hot-toast';
 import { AiOutlineMenuUnfold } from 'react-icons/ai';
+import { projectApi } from '../../api';
 import DatePickerInput from '../../components/DatePickerInput';
 import RadioButton from '../../components/common/RadioButton';
+import KeywordInput from '../../components/common/keywordInput';
 import DashboardMenu from '../../components/userPanel/DashboardMenu';
 import ScrollToTop from '../../utils/RouteChange';
 
 const AddProject = () => {
     ScrollToTop();
-   
+
     const onsiteOption = [
         {
             key: 'onsite-1',
             value: 'on',
             label: 'on',
-            inputName: 'onsite-work',
+            inputName: 'onsite_work',
         },
         {
             key: 'onsite-2',
             value: 'off',
             label: 'off',
-            inputName: 'onsite-work',
+            inputName: 'onsite_work',
             checked: true
         }
     ];
@@ -36,7 +39,7 @@ const AddProject = () => {
             value: 'off',
             label: 'off',
             inputName: 'hardDeadline',
-            checked: true
+
         }
     ];
     const projectTypeOption = [
@@ -51,7 +54,6 @@ const AddProject = () => {
             value: 'Team',
             label: 'Team',
             inputName: 'projecType',
-            checked: true
         },
         {
             key: 'projectType-3',
@@ -106,7 +108,6 @@ const AddProject = () => {
             value: 'Proficient',
             label: 'Proficient',
             inputName: 'projectExperience',
-            checked: true
         },
         {
             key: 'projectExperience-4',
@@ -201,35 +202,197 @@ const AddProject = () => {
 
     ];
 
-    const handelProjectSubmit = (event) =>{
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        console.log(formData);
-        alert('browser console to see the sumited value ! need to work more on submit');
-    }
+
+    const mes = {};
+    const [errorMsg, setErrorMsg] = useState(mes);
+    const formRef = useRef(null);
+
+
+
+    useEffect(() => {
+        if (Object.keys(errorMsg).length !== 0) {
+            if (formRef.current) {
+                formRef.current.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+    }, [errorMsg]);
+
     const [isActiveMenu, setIsActiveMenu] = useState(false);
 
     const handelDashMenu = () => {
         setIsActiveMenu(!isActiveMenu);
     }
 
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleLoadingState = () => {
+        const body = document.querySelector('body');
+        if (isLoading) {
+            body.classList.add('loading_BG');
+            // Add your custom code here for the loading state
+        } else {
+            body.classList.remove('loading_BG');
+            // Add your custom code here for when loading is finished
+        }
+    };
+
+
+    useEffect(() => {
+        handleLoadingState();
+    }, [isLoading])
+
+
+
+    const handelProjectSubmit = async (event) => {
+        event.preventDefault();
+        setErrorMsg({});
+        const formData = new FormData(event.target);
+        const formDataObject = {};
+
+        formData.forEach((value, key) => {
+            formDataObject[key] = value;
+        });
+        // validation 
+        let isValid = true;
+        if (formDataObject.project_name.length === 0) {
+            setErrorMsg(prevErrorMsg => ({
+                ...prevErrorMsg,
+                project_name: 'Project Name is Required',
+            }));
+            isValid = false;
+        }
+        if (formDataObject.user_name.length === 0) {
+            setErrorMsg(prevErrorMsg => ({
+                ...prevErrorMsg,
+                user_name: 'User Name is Required',
+            }));
+            isValid = false;
+        }
+        if (formDataObject.user_email.length === 0) {
+            setErrorMsg(prevErrorMsg => ({
+                ...prevErrorMsg,
+                user_email: 'User Email is Required',
+            }));
+            isValid = false;
+        }
+        if (formDataObject.affiliation.length === 0) {
+            setErrorMsg(prevErrorMsg => ({
+                ...prevErrorMsg,
+                affiliation: 'Affiliation is Required',
+            }));
+            isValid = false;
+        }
+        if (formDataObject.project_desc.length < 40) {
+            setErrorMsg(prevErrorMsg => ({
+                ...prevErrorMsg,
+                project_desc: 'Enter at least 40 characters',
+            }));
+            isValid = false;
+        }
+        if (formDataObject.project_keywords.length === 0) {
+            setErrorMsg(prevErrorMsg => ({
+                ...prevErrorMsg,
+                project_keywords: 'Project Keywords is Required',
+            }));
+            isValid = false;
+        }
+        if (!('projecType' in formDataObject)) {
+            setErrorMsg(prevErrorMsg => ({
+                ...prevErrorMsg,
+                projecType: 'Project Type is Required',
+            }));
+            isValid = false;
+        }
+        if (!('projectExperience' in formDataObject)) {
+            setErrorMsg(prevErrorMsg => ({
+                ...prevErrorMsg,
+                projectExperience: 'Project Experience is Required',
+            }));
+            isValid = false;
+        }
+        if (!('hardDeadline' in formDataObject)) {
+            setErrorMsg(prevErrorMsg => ({
+                ...prevErrorMsg,
+                hardDeadline: 'Project hard deadline is Required',
+            }));
+            isValid = false;
+        }
+
+
+
+
+
+        if (isValid) {
+            try {
+                setIsLoading(true);
+                const promise = projectApi.createProject(formDataObject);
+                await toast.promise(promise, {
+                    loading: 'Submiting Project...', // Display a loading message
+                    success: (response) => {
+                        if (response.data.success) {
+                            event.target.reset();
+                            setIsLoading(false);
+                            return 'Project Successfully Submitted !';
+                        } else {
+                            return 'Unexpected error occurred';
+                        }
+                    },
+                    error: (error) => {
+                        if (error.response) {
+                            if (error.response.status === 409) {
+                                const resMsg = error.response.data.message.replace('Error: ', '');
+                                const [field, msg] = resMsg.split('.');
+                                setErrorMsg(prevErrorMsg => ({
+                                    ...prevErrorMsg,
+                                    [field]: msg,
+                                }));
+                                return `Submiting Project failed: ${msg}`;
+                            } else {
+                                console.error('Request failed with status code', error.response.status);
+                                return 'Request failed';
+                            }
+                        } else {
+                            console.error('Error', error.message);
+                            return `Error: ${error.message}`;
+                        }
+                    },
+                    style: {
+                        duration: 6000,
+                        position: 'top-right', // Set the position to top-right
+                    },
+                });
+                // console.log(responseApi);
+            } catch (error) {
+                // console.error('Error', error);
+                console.log('');
+            } finally {
+                setIsLoading(false); // Set loading back to false after the form submission
+            }
+            // console.log(formDataObject);
+        }
+
+
+
+
+    }
 
     return (
         <section className="full_widht_auth_section">
             <div className="container">
                 <div className="dashboard">
                     {/* <!-- Dashboard Menu --> */}
-                    <DashboardMenu  isActiveMenu={isActiveMenu}/>
+                    <DashboardMenu isActiveMenu={isActiveMenu} />
                     {/* <!-- Add Project --> */}
                     <div className="dashboard_add_project">
                         {/* <!-- Add Project head --> */}
                         <div className="add_project_head">
-                        <button className='dasMenuBtn' onClick={handelDashMenu}>
+                            <button className='dasMenuBtn' onClick={handelDashMenu}>
                                 <AiOutlineMenuUnfold />
                             </button>
                             <h3 className="title">Add Project</h3>
                         </div>
-                        <form onSubmit={handelProjectSubmit} className="add_project_form">
+                        <form onSubmit={handelProjectSubmit} ref={formRef} className="add_project_form">
                             <div className="two_columns">
                                 {/* <!-- Single Input --> */}
                                 <div className="form_control">
@@ -237,16 +400,19 @@ const AddProject = () => {
                                         What is the name of your project?<span>*</span>
                                     </label>
                                     <input
+                                        className={errorMsg.project_name ? 'border-warring' : ''}
                                         type="text"
                                         name="project_name"
                                         id="project_name"
                                         placeholder="Project Name"
                                     />
+                                    {errorMsg.project_name && <div className='error-msg'>{errorMsg.project_name}</div>}
                                 </div>
                                 {/* <!-- Single Input --> */}
                                 <div className="form_control">
                                     <label htmlFor="user_name"> What is your name?<span>*</span> </label>
-                                    <input type="text" name="user_name" id="user_name" placeholder="Name" />
+                                    <input className={errorMsg.user_name ? 'border-warring' : ''} type="text" name="user_name" id="user_name" placeholder="Name" />
+                                    {errorMsg.user_name && <div className='error-msg'>{errorMsg.user_name}</div>}
                                 </div>
                             </div>
                             <div className="two_columns">
@@ -254,11 +420,13 @@ const AddProject = () => {
                                 <div className="form_control">
                                     <label htmlFor="user_email"> What is your email?<span>*</span> </label>
                                     <input
+                                        className={errorMsg.user_email ? 'border-warring' : ''}
                                         type="email"
                                         name="user_email"
                                         id="user_email"
                                         placeholder="Email"
                                     />
+                                    {errorMsg.user_email && <div className='error-msg'>{errorMsg.user_email}</div>}
                                 </div>
                                 {/* <!-- Single Input --> */}
                                 <div className="form_control">
@@ -266,11 +434,13 @@ const AddProject = () => {
                                         What is your affiliation?<span>*</span>
                                     </label>
                                     <input
+                                        className={errorMsg.affiliation ? 'border-warring' : ''}
                                         type="text"
                                         name="affiliation"
                                         id="affiliation"
                                         placeholder="Affiliation"
                                     />
+                                    {errorMsg.affiliation && <div className='error-msg'>{errorMsg.affiliation}</div>}
                                 </div>
                             </div>
                             {/* <!-- Single Input --> */}
@@ -279,26 +449,44 @@ const AddProject = () => {
                                     Provide a brief description of your project.<span>*</span>
                                 </label>
                                 <textarea
+                                    className={errorMsg.project_desc ? 'border-warring' : ''}
                                     name="project_desc"
                                     id="project_desc"
                                     rows="2"
                                     placeholder="Description"
                                 ></textarea>
+                                {errorMsg.project_desc && <div className='error-msg'>{errorMsg.project_desc}</div>}
                             </div>
                             <div className="two_columns">
+                                {/* <!-- Single Input --> */}
+                                {/* <div className="form_control">
+                                    <label htmlFor="project_keywords">
+                                        Provide up to (5) keywords engineers can use to find your
+                                        project.<span>*</span>
+                                    </label>
+                                    <input
+                                        className={errorMsg.project_keywords ? 'border-warring' : ''}
+                                        type="text"
+                                        name="project_keywords"
+                                        id="project_keywords"
+                                        placeholder="keywords"
+                                    />
+                                    {errorMsg.project_keywords && <div className='error-msg'>{errorMsg.project_keywords}</div>}
+                                </div> */}
                                 {/* <!-- Single Input --> */}
                                 <div className="form_control">
                                     <label htmlFor="project_keywords">
                                         Provide up to (5) keywords engineers can use to find your
                                         project.<span>*</span>
                                     </label>
-                                    <input
-                                        type="text"
-                                        name="project_keywords"
-                                        id="project_keywords"
-                                        placeholder="keywords"
-                                    />
+                                    <KeywordInput />
+                                    {errorMsg.project_keywords && <div className='error-msg'>{errorMsg.project_keywords}</div>}
                                 </div>
+
+
+
+
+
                                 {/* <!-- Single Input --> */}
                                 <div className="form_control">
                                     <label>
@@ -396,9 +584,10 @@ const AddProject = () => {
                                     {
                                         projectTypeOption.map(singleData => <RadioButton key={singleData.key} radionData={singleData} />)
                                     }
+                                    {errorMsg.projecType && <div className='error-msg'>{errorMsg.projecType}</div>}
 
 
-                                  
+
 
 
                                 </div>
@@ -411,7 +600,7 @@ const AddProject = () => {
                                     }
 
 
-                                   
+
 
                                 </div>
                             </div>
@@ -420,13 +609,13 @@ const AddProject = () => {
                                 {/* <!-- Single Input --> */}
                                 <div className="form_control">
                                     <label >
-                                    How much experience will this project require? <span>*</span>
+                                        How much experience will this project require? <span>*</span>
                                     </label>
 
                                     {
                                         projectExperienceOption.map(singleData => <RadioButton key={singleData.key} radionData={singleData} />)
                                     }
-
+                                    {errorMsg.projectExperience && <div className='error-msg'>{errorMsg.projectExperience}</div>}
 
                                 </div>
 
@@ -451,13 +640,13 @@ const AddProject = () => {
 
 
                             <div className="two_columns">
-                                 {/* <!-- Single Input --> */}
-                                 <div className="form_control">
+                                {/* <!-- Single Input --> */}
+                                <div className="form_control">
                                     <label htmlFor="p_deadline"> What is your project deadline? </label>
-                                    <DatePickerInput id='p_deadline' name='p_deadline'/>
+                                    <DatePickerInput id='p_deadline' name='p_deadline' />
                                 </div>
 
-                              
+
 
 
 
@@ -470,7 +659,7 @@ const AddProject = () => {
                                     {
                                         ProjectHardDeadlineOption.map(singleData => <RadioButton key={singleData.key} radionData={singleData} />)
                                     }
-                                  
+                                    {errorMsg.hardDeadline && <div className='error-msg'>{errorMsg.hardDeadline}</div>}
 
                                 </div>
                             </div>
@@ -486,7 +675,7 @@ const AddProject = () => {
                                     {
                                         expectedTimeProjectOption.map(singleData => <RadioButton key={singleData.key} radionData={singleData} />)
                                     }
-                                   
+
                                 </div>
                                 {/* <!-- Single Input --> */}
                                 <div className="form_control">
@@ -498,9 +687,9 @@ const AddProject = () => {
                                     {
                                         haveProjectBudgetOption.map(singleData => <RadioButton key={singleData.key} radionData={singleData} />)
                                     }
+                                    {errorMsg.haveProjectBudget && <div className='error-msg'>{errorMsg.haveProjectBudget}</div>}
 
 
-                                  
                                 </div>
 
                             </div>

@@ -171,9 +171,7 @@ const SignUp = () => {
                         if (error.response) {
                             if (error.response.status === 409) {
                                 const resMsg = error.response.data.message.replace('Error: ', '');
-                                console.log(resMsg);
                                 const [field, msg] = resMsg.split('.');
-                                console.log(field);
                                 setErrorMsg(prevErrorMsg => ({
                                     ...prevErrorMsg,
                                     [field]: msg,
