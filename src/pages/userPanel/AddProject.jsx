@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast';
 import { AiOutlineMenuUnfold } from 'react-icons/ai';
 import { projectApi } from '../../api';
 import DatePickerInput from '../../components/DatePickerInput';
+import ListInput from '../../components/common/ListInput';
 import RadioButton from '../../components/common/RadioButton';
 import DashboardMenu from '../../components/userPanel/DashboardMenu';
 import ScrollToTop from '../../utils/RouteChange';
@@ -200,11 +201,15 @@ const AddProject = () => {
         }
 
     ];
+ 
+
+
 
 
     const mes = {};
     const [errorMsg, setErrorMsg] = useState(mes);
     const formRef = useRef(null);
+
 
 
 
@@ -239,8 +244,11 @@ const AddProject = () => {
 
     useEffect(() => {
         handleLoadingState();
-    }, [isLoading])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isLoading]);
 
+
+    const [project_keywords, set_project_keywords] = useState({});
 
 
     const handelProjectSubmit = async (event) => {
@@ -248,10 +256,16 @@ const AddProject = () => {
         setErrorMsg({});
         const formData = new FormData(event.target);
         const formDataObject = {};
+        console.log(project_keywords.lists);
+        if(project_keywords.lists.length !== 0){
+            formData.append('project_keywords', JSON.stringify(project_keywords.lists));
+        }
+        console.log(formData);
 
         formData.forEach((value, key) => {
             formDataObject[key] = value;
         });
+        console.log(formDataObject);
         // validation 
         let isValid = true;
         if (formDataObject.project_name.length === 0) {
@@ -289,11 +303,12 @@ const AddProject = () => {
             }));
             isValid = false;
         }
-        if (formDataObject.project_keywords.length === 0) {
+        if (!('project_keywords' in formDataObject)) {
             setErrorMsg(prevErrorMsg => ({
                 ...prevErrorMsg,
                 project_keywords: 'Project Keywords is Required',
             }));
+            console.log('get errror');
             isValid = false;
         }
         if (!('projecType' in formDataObject)) {
@@ -458,7 +473,7 @@ const AddProject = () => {
                             </div>
                             <div className="two_columns">
                                 {/* <!-- Single Input --> */}
-                                <div className="form_control">
+                                {/* <div className="form_control">
                                     <label htmlFor="project_keywords">
                                         Provide up to (5) keywords engineers can use to find your
                                         project.<span>*</span>
@@ -471,16 +486,16 @@ const AddProject = () => {
                                         placeholder="keywords"
                                     />
                                     {errorMsg.project_keywords && <div className='error-msg'>{errorMsg.project_keywords}</div>}
-                                </div>
+                                </div> */}
                                 {/* <!-- Single Input --> */}
-                                {/* <div className="form_control">
+                                <div className="form_control">
                                     <label htmlFor="project_keywords">
                                         Provide up to (5) keywords engineers can use to find your
                                         project.<span>*</span>
                                     </label>
-                                    <KeywordInput />
+                                    <ListInput list_keywords={project_keywords} set_list_keyword={set_project_keywords}/>
                                     {errorMsg.project_keywords && <div className='error-msg'>{errorMsg.project_keywords}</div>}
-                                </div> */}
+                                </div>
 
 
 
@@ -769,10 +784,15 @@ const AddProject = () => {
                                     </textarea>
                                 </div>
                             </div>
+                            <hr className='inputhr' />
                             <div className="form_submit al_submit_button">
+                                <button type="reset" className="btn btn-submit btn-light">
+                                    Cancel
+                                </button>
                                 <button type="submit" className="btn btn-submit btn-dark">
                                     Submit
                                 </button>
+
                             </div>
                         </form>
                     </div>

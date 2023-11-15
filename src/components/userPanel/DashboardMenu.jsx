@@ -9,8 +9,7 @@ import useAuth from '../../hooks/UseAuth';
 import RanderNav from './RanderNav';
 
 const DashboardMenu = ({isActiveMenu}) => {
-    const {setAuth,auth} = useAuth();
-    console.log(auth);
+    const {setAuth} = useAuth();
     const LogOuthandel = (event) => {
         event.preventDefault();
        setAuth({});

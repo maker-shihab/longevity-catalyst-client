@@ -6,19 +6,17 @@ import { authApi } from '../../api';
 import '../../assets/styles/authPages.css';
 import SignupModal from '../../components/SignupModal';
 import AuthHeader from '../../components/auth/AuthHeader';
-import useAuth from '../../hooks/UseAuth';
+import { storeUserInfo } from '../../services/auth.service';
 import ScrollToTop from '../../utils/RouteChange';
 const Login = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const navigate = useNavigate();
-    const { setAuth } = useAuth();
+    // const { setAuth } = useAuth();
     const location = useLocation();
     const from = location.state?.from?.pathname || '/user/dashboard';
     const mes = {};
     const [errorMsg, setErrorMsg] = useState(mes);
     const formRef = useRef(null);
-
-
 
 
     ScrollToTop();
@@ -101,6 +99,48 @@ const Login = () => {
 
         // After validation, perform the form submission with loading message
         if (isValid) {
+
+
+
+            // setIsLoading(true);
+            // const loadingToast = toast.loading('Loging...');
+            // try {
+            //     const response = await authApi.login(formDataObject, {
+            //         withCredentials: true
+            //     });
+            //     console.log(response);
+            //     if (response.data.data.success && response.data.data.statusCode === 200) {
+            //         setIsLoading(false);
+
+            //         storeUserInfo({ accessToken: response.data.data.accessToken });
+
+            //         navigate(from, { replace: true });
+            //         toast.success('Sign In Successfully Done !');
+            //     }
+            //     else if (response.statusCode === 409) {
+            //         const resMsg = response.message.replace('Error: ', '');
+            //         const [msg] = resMsg.split('.');
+            //         setErrorMsg(prevErrorMsg => ({
+            //             ...prevErrorMsg,
+            //             username: 'Invalid Username',
+            //         }));
+            //         setErrorMsg(prevErrorMsg => ({
+            //             ...prevErrorMsg,
+            //             password: 'Invalid Password',
+            //         }));
+            //         toast.error(`Sign In failed: ${msg}`);
+            //     } else {
+            //         toast.error(`Something went wrong!`);
+            //         console.log(response);
+            //     }
+            // } finally {
+            //     setIsLoading(false);
+            //     toast.dismiss(loadingToast);
+            // }
+
+
+
+
             try {
                 setIsLoading(true);
                 const promise = authApi.login(formDataObject,{
@@ -109,15 +149,19 @@ const Login = () => {
                 await toast.promise(promise, {
                     loading: 'Login...', // Display a loading message
                     success: (response) => {
-                        if (response.data.success) {
+                        if (response?.data?.success) {
                             // document.querySelector('body').classList.remove('loading_BG');
-                           
+
                             setIsLoading(false);
-                            setAuth({accessToken:response.data.data.accessToken});
+
+                            // setAuth({accessToken: response.data.data.accessToken});
+
+                            storeUserInfo({ accessToken: response.data.data.accessToken });
+
                             navigate(from, { replace: true });
-                          
+
                             return 'Sign In Successfully Done !';
-                            
+
                         } else {
                             return 'Unexpected error occurred';
                         }
@@ -157,7 +201,7 @@ const Login = () => {
             } finally {
                 setIsLoading(false); // Set loading back to false after the form submission
             }
-            // console.log(formDataObject);
+            console.log(formDataObject);
         }
 
     }
@@ -208,7 +252,7 @@ const Login = () => {
                             Not a Member?
                             <button onClick={openModal}> &nbsp; Sign Up</button>
                             <SignupModal open={modalOpen} onClose={closeModal} onSignUp={handleCreateAccountClick} />
-                      
+
                         </p>
                     </div>
                 </div>

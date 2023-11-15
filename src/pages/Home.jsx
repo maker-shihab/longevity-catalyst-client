@@ -6,6 +6,7 @@ import TradingProjectSlider from '../components/TradingProjectSlider';
 import TrustSlider from '../components/TrustSlider';
 import ScrollToTop from '../utils/RouteChange';
 
+
 const Home = () => {
   ScrollToTop();
   return (
@@ -28,13 +29,13 @@ const Home = () => {
         </div>
       </section>
       {/* ED: Banner section  */}
-
+    
       {/* ST:- trust by area */}
       <section className="full_width_trust_by_section section_padding">
         <div className="container">
           <div className="trust_by_wrapper">
             <h6>Trusted by</h6>
-              <TrustSlider/>
+            <TrustSlider />
           </div>
         </div>
       </section>
@@ -64,7 +65,7 @@ const Home = () => {
         </div>
       </section>
       {/* ED:- trust by area */}
-      
+
       {/* ST:- Project show area */}
       <section className="project_show_section home_project_show">
         <div className="container">

@@ -32,6 +32,27 @@
   font-size: 20px;
   display: none;
 }
+
+.upload_avater_withOld {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+}
+.upload_avater_withOld .drag_imge_input {
+  margin: 0;
+  width: 100%;
+}
+
+.show_old_avater img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  max-width: 64px;
+  max-height: 64px;
+  border-radius: 50px;
+}
 @media (max-width: 991px) {
   .dashboard {
     margin-top: 40px;

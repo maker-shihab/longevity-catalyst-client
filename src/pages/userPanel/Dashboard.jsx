@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { AiOutlineMenuUnfold } from 'react-icons/ai';
 import DashboardMenu from '../../components/userPanel/DashboardMenu';
-import UseRefreshToken from '../../hooks/UseRefreshToken';
 import ScrollToTop from '../../utils/RouteChange';
 
 
 const Dashboard = () => {
     ScrollToTop();
-    const refresh = UseRefreshToken();
+
     const [isActiveMenu, setIsActiveMenu] = useState(false);
 
     const handelDashMenu = () => {

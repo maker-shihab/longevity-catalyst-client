@@ -11,7 +11,7 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `${token}`;
   }else{
-    config.headers.Authorization = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIwLCJ1c2VyUm9sZSI6InJlc2VhcmNoZXIiLCJpYXQiOjE2OTkzODU5MjEsImV4cCI6MTY5OTU1ODcyMX0.MSQ6-1yqgAlhfUtO7c6sIGP1EDq9XKVz3C7XreMPfqk";
+    config.headers.Authorization = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIwLCJ1c2VyUm9sZSI6InJlc2VhcmNoZXIiLCJpYXQiOjE2OTk2NDcxMDAsImV4cCI6MTY5OTgxOTkwMH0.v0XgwnGWyzZLDx4e4yOareIdlk5BW3BXibpybNlHVHY";
   }
   return config;
 });
@@ -27,8 +27,8 @@ api.interceptors.response.use(
 );
 
 export const authApi = {
-  signup: (userData) => api.post('/users/user', userData),
-  login: (credentials) => api.post('/auth/login', credentials)
+  signup: (userData) => api.post(`${(BASE_URL)}/auth/signup`, userData),
+  login: (credentials) => api.post(`${(BASE_URL)}/auth/login`, credentials)
 };
 
 export const projectApi = {
@@ -38,7 +38,6 @@ export const projectApi = {
   updateProject: (id, projectData) => api.patch(`/projects/${id}`, projectData), // Update project
   deleteProject: (id) => api.delete(`/projects/${id}`) // Delete project
 }
-
 
 
 

@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-hot-toast';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -17,13 +19,12 @@ const SignUp = () => {
 
     const [getAuthF, setAuthF] = useState(checkAuth());
     const [profilePic, setProfilePic] = useState({});
-    // console.log(setAuthF);
 
     useEffect(() => {
         if (getAuthF) {
             navigate('/user/dashboard');
         }
-    }, [getAuthF]);
+    }, [navigate, getAuthF]);
 
     ScrollToTop();
     const mes = {};
@@ -39,7 +40,6 @@ const SignUp = () => {
 
     }, [errorMsg]);
 
-
     const [isLoading, setIsLoading] = useState(false);
 
     const handleLoadingState = () => {
@@ -48,11 +48,10 @@ const SignUp = () => {
             body.classList.add('loading_BG');
             // Add your custom code here for the loading state
         } else {
-            body.classList.remove('loading_BG');
+            return body.classList.remove('loading_BG');
             // Add your custom code here for when loading is finished
         }
     };
-
 
     useEffect(() => {
         handleLoadingState();
@@ -149,9 +148,47 @@ const SignUp = () => {
 
         // end proccsing image 
 
-
         // After validation, perform the form submission with loading message
         if (isValid) {
+            // setIsLoading(true);
+            // const loadingToast = toast.loading('Signing Up...');
+            // try {
+            //     const response = await authApi.signup(formData);
+            //     console.log(response);
+            //     if (response.success && response.statusCode === 200) {
+            //         setIsLoading(false);
+            //         navigate('/login');
+            //         toast.success('Sign Up Successfully Done !');
+            //     }
+            //     else if (response.statusCode === 409) {
+            //         const resMsg = response.message.replace('Error: ', '');
+            //         const [field, msg] = resMsg.split('.');
+            //         setErrorMsg(prevErrorMsg => ({
+            //             ...prevErrorMsg,
+            //             [field]: msg,
+            //         }));
+            //         toast.error(`Sign up failed: ${msg}`);
+            //     }else{
+            //         toast.error(`Something went wrong!`);
+            //         console.log(response);
+            //     }
+            // } finally {
+            //     setIsLoading(false);
+            //     toast.dismiss(loadingToast);
+            // }
+
+            // await authApi.signup(formData).then((res)=>{
+            //     console.log(res);
+            //     console.log('res');
+            //     toast.error('This is an error!');
+            //     toast.dismiss(toastId);
+            // }).catch((err)=>{
+            //     console.log("Error Message"+err);
+            //     console.log('err');
+            // });
+
+
+
             try {
                 setIsLoading(true);
                 const promise = authApi.signup(formData);

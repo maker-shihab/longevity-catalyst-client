@@ -4,14 +4,22 @@ import { FaChevronDown, FaRegUser } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../assets/images/logo.png';
 import '../../assets/styles/header.css';
-import useAuth from '../../hooks/UseAuth';
+import { authKey } from '../../constants/storageKey';
+import { isLoggdIn, removeUserInfo } from '../../services/auth.service';
 import CustomSelect from '../CustomSelect';
 import SignupModal from '../SignupModal';
 
 const Header = () => {
+ 
   const [modalOpen, setModalOpen] = useState(false);
   const navigate = useNavigate();
-  const {auth} = useAuth();
+  const isLoggedIn = isLoggdIn();
+
+  // For testing
+  const handleLogout = () => {
+    removeUserInfo(authKey);
+    navigate('/login');
+  }
   const openModal = () => {
     setModalOpen(true);
   };
@@ -32,7 +40,7 @@ const Header = () => {
   };
 
   const [isOpenSearchBox, setOpenSearchBox] = useState(false);
-  const handelSearchBox = () =>{
+  const handelSearchBox = () => {
     console.log("Before state update:", isOpenSearchBox);
     setOpenSearchBox(!isOpenSearchBox);
     console.log("After state update:", isOpenSearchBox);
@@ -47,9 +55,9 @@ const Header = () => {
               <img src={logo} alt="logo" />
             </Link>
           </div>
-          <div className={`header_search ${isOpenSearchBox ? 'active_header_search' : '' }`}>
+          <div className={`header_search ${isOpenSearchBox ? 'active_header_search' : ''}`}>
             <form action="#" method="post">
-              <span className='header_search_icon '>
+              <span className='header_search_icon'>
                 <BiSearch />
               </span>
               <input
@@ -63,24 +71,32 @@ const Header = () => {
             </form>
           </div>
           <div className="header_buttons">
-          <button className='dropdown-button res-search-btn' onClick={handelSearchBox}>
-            <BiSearch />
-          </button>
+            <button className='dropdown-button res-search-btn' onClick={handelSearchBox}>
+              <BiSearch />
+            </button>
             {
-              auth?.accessToken ? <Link to='/user/dashboard' className='btn btn-dark'>
-                Dashboard
-              </Link> : <> <Link to='/login' className='btn btn-dark'>
-                Login
-              </Link>
-                <div className="custom-dropdown">
-                  <button className="dropdown-button" onClick={openModal}>
-                    <FaRegUser />
-                    <FaChevronDown />
-                  </button>
+              isLoggedIn ? <>
+                <button type='button' onClick={handleLogout} className='btn btn-dark'>
+                  Logout
+                </button>
+                <Link to='/user/dashboard' className='btn btn-dark'>
+                  Dashboard
+                </Link> 
+                </>
+                :
+                <>
+                  <Link to='/login' className='btn btn-dark'>
+                    Login
+                  </Link>
+                  <div className="custom-dropdown">
+                    <button className="dropdown-button" onClick={openModal}>
+                      <FaRegUser />
+                      <FaChevronDown />
+                    </button>
 
-                  <SignupModal open={modalOpen} onClose={closeModal} onSignUp={handleCreateAccountClick} />
-                </div>
-              </>
+                    <SignupModal open={modalOpen} onClose={closeModal} onSignUp={handleCreateAccountClick} />
+                  </div>
+                </>
             }
           </div>
         </div>

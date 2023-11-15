@@ -1,0 +1,55 @@
+/* .text-editor-style-1  */
+
+.text-editor-style-1 .ql-toolbar {
+  border: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+.text-editor-style-1 .ql-header {
+  min-width: 240px;
+  border: 1px solid #c1bfbf;
+  border-radius: 6px;
+  color: #101828;
+  font-family: Inter;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  padding: 6px 5px;
+  height: inherit;
+}
+
+.text-editor-style-1
+  .ql-toolbar.ql-snow
+  .ql-picker.ql-expanded
+  .ql-picker-label {
+  border-color: transparent;
+}
+
+.text-editor-style-1 .ql-snow .ql-picker.ql-expanded .ql-picker-label {
+  color: #333;
+}
+
+.text-editor-style-1 .ql-picker-label.ql-active,
+.text-editor-style-1 .ql-picker-label:hover,
+.text-editor-style-1 .ql-picker-item:hover {
+  color: #333 !important;
+}
+
+.text-editor-style-1 .ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke {
+  stroke: #333 !important;
+}
+
+.text-editor-style-1 .ql-container {
+  border: 1px solid #b7b7b7 !important;
+  border-radius: 6px;
+  min-height: 128px;
+}
+/* In your textEditor.css file */
+.text-editor-style-1 [data-placeholder] {
+  color: #d5d7db;
+  font-family: Inter;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px;
+}
